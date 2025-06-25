@@ -1,0 +1,108 @@
+# Adaptive Variable Compliance Bimanual Robot Control using Meta-RL and Graph Attention Transformer
+
+This project implements an adaptive variable compliance control system for bimanual robots using Meta-Reinforcement Learning (Meta-RL) combined with a Graph Attention Transformer (GAT). It builds on the ALOHA robotic simulation platform in MuJoCo and demonstrates real-time learning from few-shot demonstrations for stable bimanual manipulation.
+
+---
+
+## 🔧 Installation Guide
+
+### Step 1: Install MuJoCo 210
+
+- Download from: [MuJoCo Releases](https://github.com/google-deepmind/mujoco/releases)
+- Extract and copy `mjkey.txt` into the `~/.mujoco/mujoco210/bin` directory.
+- Set environment variables in your shell config (e.g., `.bashrc` or `.zshrc`):
+  ```bash
+  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/.mujoco/mujoco210/bin
+  export MUJOCO_PY_MUJOCO_PATH=~/.mujoco/mujoco210
+Step 2: Python Setup
+Python Version: 3.9
+
+Recommended IDE: Install PyCharm with a free 1-year student license from JetBrains Student Pack
+
+Step 3: Folder Organization
+Structure the folders as:
+
+makefile
+Copy
+Edit
+D:\PhD\0PhD-Implementation\0ALOHA-ALL\mobile_aloha_sim-master\aloha_mujoco\aloha\meshes_mujoco\aloha_rl_project
+📦 Dependencies
+Ensure the following versions are installed (preferably via pip or requirements.txt):
+
+makefile
+Copy
+Edit
+Python 3.9
+mujoco==3.3.3
+mujoco-py==2.1.2.14
+gym==0.26.2
+gymnasium==1.1.1
+torch==2.7.1
+matplotlib==3.10.3
+numpy==2.3.1
+opencv-python==4.11.0.86
+stable-baselines3==2.7.0a0
+networkx==3.5
+pandas==2.3.0
+scikit-learn
+pyopengl==3.1.9
+jinja2==3.1.6
+fsspec==2025.5.1
+pyyaml==6.0.2
+shimmy==2.0.0
+You can install them with:
+
+bash
+Copy
+Edit
+pip install -r requirements.txt
+🚀 Running the Algorithm
+To run the adaptive compliance learning algorithm:
+
+Navigate to the project root:
+
+bash
+Copy
+Edit
+cd D:\PhD\0PhD-Implementation\0ALOHA-ALL\mobile_aloha_sim-master\aloha_mujoco\aloha\meshes_mujoco\aloha_rl_project
+Execute:
+
+bash
+Copy
+Edit
+python adaptive_variable_compliance_control.py
+Use the MuJoCo viewer to manually control and observe the robot's adaptation to real-time compliance and feedback.
+
+📁 Dataset and Files
+A complete version of the setup (with models, demos, and code) is available on Google Drive:
+👉 Download Full Project Folder
+
+📊 Output
+Loss and reward plots
+
+Joint position heatmaps
+
+Compliance factor curves
+
+Real-time assisted control feedback in MuJoCo
+
+📌 Notes
+Ensure MuJoCo viewer works correctly.
+
+Always run with Python 3.9 (avoid 3.10+ for mujoco-py compatibility).
+
+For troubleshooting environment setup, validate that MuJoCo is correctly detected:
+
+python
+Copy
+Edit
+import mujoco
+print(mujoco.__version__)
+🧠 Credits
+Developed as part of PhD research on adaptive learning-based control in haptic teleoperation using bimanual robotics.
+
+vbnet
+Copy
+Edit
+
+Let me know if you’d like a `requirements.txt` file auto-generated too.
