@@ -27,7 +27,7 @@ Structure the folders as:
 makefile
 Copy
 Edit
-D:\PhD\\mobile_aloha_sim-master\aloha_mujoco\aloha\meshes_mujoco\aloha_rl_project
+D:\\mobile_aloha_sim-master\aloha_mujoco\aloha\meshes_mujoco\aloha_rl_project
 📦 Dependencies
 Ensure the following versions are installed (preferably via pip or requirements.txt):
 
@@ -76,7 +76,7 @@ python adaptive_variable_compliance_control.py
 Use the MuJoCo viewer to manually control and observe the robot's adaptation to real-time compliance and feedback.
 
 📁 Dataset and Files
-A complete version of the setup (with models, demos, and code) is available on Google Drive:
+A complete version of the setup (with models, demos, and code) is available on Google Drive ot in github :
 👉 Download Full Project Folder
 
 📊 Output
