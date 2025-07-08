@@ -27,7 +27,7 @@ Structure the folders as:
 makefile
 Copy
 Edit
-D:\PhD\0PhD-Implementation\0ALOHA-ALL\mobile_aloha_sim-master\aloha_mujoco\aloha\meshes_mujoco\aloha_rl_project
+D:\PhD\\mobile_aloha_sim-master\aloha_mujoco\aloha\meshes_mujoco\aloha_rl_project
 📦 Dependencies
 Ensure the following versions are installed (preferably via pip or requirements.txt):
 
@@ -66,7 +66,7 @@ Navigate to the project root:
 bash
 Copy
 Edit
-cd D:\PhD\0PhD-Implementation\0ALOHA-ALL\mobile_aloha_sim-master\aloha_mujoco\aloha\meshes_mujoco\aloha_rl_project
+cd D:\\mobile_aloha_sim-master\aloha_mujoco\aloha\meshes_mujoco\aloha_rl_project
 Execute:
 
 bash
