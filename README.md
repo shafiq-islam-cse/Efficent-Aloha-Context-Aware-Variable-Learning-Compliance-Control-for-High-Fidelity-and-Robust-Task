@@ -1,4 +1,4 @@
-# Efficent-Aloha-Context-Aware-Variable-Learning-Compliance-Control-for-High-Fidelity-and-Robust-Task
+
 Step to run the project:
 # Adaptive Variable Compliance Bimanual Robot Control using Meta-RL and Graph Attention Transformer
 
