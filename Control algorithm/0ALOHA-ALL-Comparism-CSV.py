@@ -30,8 +30,6 @@ ctrl_ranges = np.array([
 
 demonstration_data = []
 save_path = "NewData.csv"
-save_path1 = "manual_demonstration_clipped1.csv"  # Make sure this CSV exists for loading training data
-save_path2 = "manual_demonstration_clipped-both object-pic-place.csv"  # Make sure this CSV exists for loading training data
 
 with viewer.launch_passive(model, data) as v:
     print("MuJoCo viewer launched. Use GUI to manually control the robot.")
@@ -98,15 +96,6 @@ class FeedForwardPolicy(nn.Module):
             nn.Linear(256, 128), nn.ReLU(),
             nn.Linear(128, output_dim))
     def forward(self, x): return self.net(x)
-
-class LSTMPolicy(nn.Module):
-    def __init__(self, input_dim, output_dim, hidden_size=128, num_layers=2):
-        super().__init__()
-        self.lstm = nn.LSTM(input_dim, hidden_size, num_layers, batch_first=True)
-        self.fc = nn.Linear(hidden_size, output_dim)
-    def forward(self, x):
-        lstm_out, _ = self.lstm(x)
-        return self.fc(lstm_out[:, -1, :])
 
 class BiACT(nn.Module):
     def __init__(self, input_dim, output_dim):
@@ -212,40 +201,6 @@ class PPOActor(nn.Module):
         std = self.log_std.exp().expand_as(mean)
         return mean, std
 
-# === Additional Models ===
-# Behavior Cloning (BC)
-# FeedForwardPolicy already defined
-
-# Implicit Behavior Cloning (IBC) as LSTMPolicy proxy
-class IBC(LSTMPolicy):
-    def __init__(self, input_dim, output_dim):
-        super().__init__(input_dim, output_dim)
-
-# Diffusion Policy (placeholder)
-class DiffusionPolicy(nn.Module):
-    def __init__(self, input_dim, output_dim):
-        super().__init__()
-        self.net = nn.Sequential(
-            nn.Linear(input_dim, 512), nn.ReLU(),
-            nn.Linear(512, 512), nn.ReLU(),
-            nn.Linear(512, output_dim)
-        )
-    def forward(self, x):
-        return self.net(x)
-
-# DAgger Policy
-class DAggerPolicy(nn.Module):
-    def __init__(self, input_dim, output_dim):
-        super().__init__()
-        self.net = nn.Sequential(
-            nn.Linear(input_dim, 128), nn.ReLU(),
-            nn.Linear(128, 128), nn.ReLU(),
-            nn.Linear(128, output_dim)
-        )
-    def forward(self, x):
-        return self.net(x)
-
-# GRAIL Model
 class GRAIL(nn.Module):
     def __init__(self, input_dim, output_dim):
         super().__init__()
@@ -258,7 +213,6 @@ class GRAIL(nn.Module):
         x = self.gat2(x, adj)
         return self.fc(x)
 
-# A2C Model
 class A2C(nn.Module):
     def __init__(self, input_dim, output_dim, hidden_dim=128):
         super().__init__()
@@ -303,21 +257,13 @@ else:
     autocast_context = nullcontext()
     scaler = None
 
+# Only keep the specified models
 models = {
     "MetaRL (LightGAT+BiACT)": MetaRL_LightGAT_BiACT(input_dim, output_dim),
-    "BiACT": BiACT(input_dim, output_dim),
-    "ACT": FeedForwardPolicy(input_dim, output_dim),
-    "LSTM": LSTMPolicy(input_dim, output_dim),
     "DQN": DQN(input_dim, output_dim),
     "DDPGActor": DDPGActor(input_dim, output_dim),
     "SACActor": SACActor(input_dim, output_dim),
     "PPOActor": PPOActor(input_dim, output_dim),
-
-    # Added new models
-    "BC": FeedForwardPolicy(input_dim, output_dim),
-    "IBC": IBC(input_dim, output_dim),
-    "Diffusion": DiffusionPolicy(input_dim, output_dim),
-    "DAgger": DAggerPolicy(input_dim, output_dim),
     "GRAIL": GRAIL(input_dim, output_dim),
     "A2C": A2C(input_dim, output_dim)
 }
@@ -341,10 +287,7 @@ def train_supervised(model, dataloader, epochs=30):
             optimizer.zero_grad()
 
             with autocast_context:
-                if isinstance(model, LSTMPolicy):
-                    batch_x = batch_x.unsqueeze(1)
-                    outputs = model(batch_x)
-                elif isinstance(model, MetaRL_LightGAT_BiACT):
+                if isinstance(model, MetaRL_LightGAT_BiACT):
                     adj = create_adj_matrix(batch_x.size(0))
                     outputs = model(batch_x, adj)
                 elif isinstance(model, GRAIL):
@@ -407,44 +350,6 @@ for name, model in models.items():
     }
 
 # === Plotting with Average in Legend, Save as Figure 6.eps to Figure 10.eps ===
-
-# Plotting Config
-os.makedirs("plots", exist_ok=True)
-
-# === Filter Models Based on MetaRL (LightGAT+BiACT) ===
-meta_metrics = train_histories["MetaRL (LightGAT+BiACT)"]
-meta_avg = {
-    "acc": np.mean(meta_metrics["acc"]),
-    "loss": np.mean(meta_metrics["loss"]),
-    "r2": np.mean(meta_metrics["r2"]),
-    "rmse": np.mean(meta_metrics["rmse"]),
-}
-
-# Keep only worse or equal performing models
-filtered_histories = {}
-for name, metrics in train_histories.items():
-    if name == "MetaRL (LightGAT+BiACT)":
-        filtered_histories[name] = metrics
-        continue
-
-    avg_acc = np.mean(metrics["acc"])
-    avg_loss = np.mean(metrics["loss"])
-    avg_r2 = np.mean(metrics["r2"])
-    avg_rmse = np.mean(metrics["rmse"])
-
-    if (
-        avg_acc <= meta_avg["acc"] and
-        avg_loss >= meta_avg["loss"] and
-        avg_r2 <= meta_avg["r2"] and
-        avg_rmse >= meta_avg["rmse"]
-    ):
-        filtered_histories[name] = metrics
-
-# Overwrite train_histories for plotting
-train_histories = filtered_histories
-
-# === Plotting: Accuracy, Loss, R2, RMSE, Time ===
-import itertools
 os.makedirs("plots", exist_ok=True)
 
 line_styles = ['-', '--', '-.', ':']
@@ -470,7 +375,6 @@ for metric, fig_name in zip(metrics_to_plot, figure_filenames):
             values = hist[metric]
             plt.plot(values, label=f"{name} (avg={np.mean(values):.4f})",
                      linestyle=style, marker=marker, color=color, alpha=0.9)
-    #plt.title(f"{metric_titles[metric]} Over Epochs")
     plt.xlabel("Epoch")
     plt.ylabel(metric_titles[metric])
     plt.grid(True)
@@ -484,4 +388,3 @@ for metric, fig_name in zip(metrics_to_plot, figure_filenames):
     plt.savefig(f"plots/{fig_name}", format='pdf', dpi=1000)
     plt.show()
     plt.close()
-
